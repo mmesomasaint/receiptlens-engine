@@ -10,7 +10,7 @@ ReceiptLens is a privacy-first tax document and invoice extraction engine design
 
 
 
-## 🛠️ Local Development Setup
+## Local Development Setup
 
 Follow these instructions to spin up the local development environment, including PostgreSQL with `pgvector`, Redis, the Python OCR/Embedding microservice, and the Node.js API engine.
 
@@ -31,11 +31,11 @@ Ensure you have the following installed on your host machine:
 ### Step 1: Clone & Install Node Dependencies
 
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone [https://github.com/your-org/receiptlens-engine.git](https://github.com/your-org/receiptlens-engine.git)
 cd receiptlens-engine
 
-# 2. Install Node.js backend dependencies
+# Install Node.js backend dependencies
 npm install
 ```
 
@@ -48,25 +48,88 @@ npm install
 cp .env.example .env
 ```
 
+**Note:** During `Google OAuth Configuration`; Ensure `http://localhost:8000/api/v1/auth/google/callback` is added under authorized redirect URIs in your Google Cloud Console project.
+
 ---
 
-### Step 3: Start PostgreSQL with `pgvector` & Redis
+### Step 3: Start Infrastructure via Docker
+
+Start PostgreSQL(`pgvector`), Redis, and the python OCR microservice using Docker Compose:
 
 ```bash
+# Start PostgreSQL with `pgvector` & Redis
 docker compose up postgres redis extractor -d
+
+# Verify the containers are running and healthy
+docker compose ps
 ```
 ---
 
-### Step 4: Run Migrations & Seed
+### Step 4: Run Database Migrations & Seed Data
 
 ```bash
-# Run Migrations & Run Prisma Seed:
-npx prisma migrate dev --name init
+# Generate Prisma Client types
+npm run prisma:generate
+
+# Execute database migrations
+npm run prisma:migrate
+
+# Seed demo test user & subscription state
 npm run prisma:seed
 
-# Start Dev Server:
+```
+
+---
+
+### Step 5: Start the Development Server
+
+Start the API with live-reloading via `tsx`: 
+
+```bash
 npm run dev
 ```
 
+The server will initialize on `http://localhost:8000`:
+
+```Plaintext
+      ReceiptLens Ingestion & Semantic Search Engine
+  ======================================================
+      API Port           : 8000
+      Environment        : development
+      Extractor Service  : http://127.0.0.1:8001
+      Redis Host         : 127.0.0.1:6379
+  ======================================================
+```
+
 ---
 
+### Step 6: Verify System Health
+
+Run health checks across both services to ensure full connectivity:
+
+```bash
+# 1. Check Node.js Engine Health
+curl http://localhost:8000/health
+# Response: {"status":"healthy","service":"receiptlens-engine"}
+
+# 2. Check Python OCR/Vector Extractor Health
+curl http://localhost:8001/health
+# Response: {"status":"healthy","service":"ocr-extractor"}
+```
+
+---
+
+## Running the Test Suite
+
+Execute unit and integration tests:
+
+```bash
+# Run all test suites
+npm test
+
+# Run unit tests only
+npm run test:unit
+
+# Run integration tests (requires Docker services active)
+npm run test:integration
+```
