@@ -5,7 +5,7 @@ import { config } from '../config';
 import { AppError } from '../errors/app-error';
 import { logger } from '../utils/logger';
 
-const redisClient = new Redis({
+export const redisClient = new Redis({
   host: config.redis.host,
   port: config.redis.port,
   maxRetriesPerRequest: null,
