@@ -1,1 +1,22 @@
+node_modules/
+dist/
+build/
+coverage/
 
+.env
+.env.local
+.env.test
+
+storage/documents/*
+!storage/documents/.gitkeep
+storage/exports/*
+!storage/exports/.gitkeep
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+.DS_Store
+*.log
+pgdata/
