@@ -1,1 +1,44 @@
+# docker-compose.yml
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/receiptlens?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - EXTRACTOR_SERVICE_URL=http://extractor:8001
+      - ENCRYPTION_KEY=0123456789abcdef0123456789abcdef
+      - JWT_SECRET=prod_jwt_secret_receiptlens_9988
+    depends_on:
+      - postgres
+      - redis
+      - extractor
 
+  extractor:
+    build:
+      context: ./extractor-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+
+  postgres:
+    image: pgvector/pgvector:pg15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=receiptlens
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
