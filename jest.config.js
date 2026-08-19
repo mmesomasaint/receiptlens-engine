@@ -1,6 +1,6 @@
-import type { Config } from 'jest';
-
-const config: Config = {
+// jest.config.js
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
@@ -17,5 +17,3 @@ const config: Config = {
   restoreMocks: true,
   testTimeout: 30000,
 };
-
-export default config;
