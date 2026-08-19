@@ -10,26 +10,63 @@ ReceiptLens is a privacy-first tax document and invoice extraction engine design
 
 
 
-## Local Setup
+## 🛠️ Local Development Setup
 
-1. **Install Node Dependencies:**
-   ```bash
-   npm install
-   ```
-2. **Configure Environment:**
-   ```bash
-   cp .env.example .env
-   ```
-3. **Start PostgreSQL with `pgvector` & Redis:**
-   ```bash
-   docker compose up postgres redis extractor -d
-   ```
-4. **Run Migrations & Seed:**
-   ```bash
-   npx prisma migrate dev --name init
-   npm run prisma:seed
-   ```
-5. **Start Dev Server:**
-   ```bash
-   npm run dev
-   ```
+Follow these instructions to spin up the local development environment, including PostgreSQL with `pgvector`, Redis, the Python OCR/Embedding microservice, and the Node.js API engine.
+
+---
+
+### Prerequisites
+
+Ensure you have the following installed on your host machine:
+
+* **Node.js**: `v20.x` or `v22.x` (LTS recommended)
+* **npm**: `v10.x+`
+* **Python**: `3.11+` (with `tesseract-ocr` installed locally if not using Docker)
+* **Docker & Docker Compose**: v2.x+ (Recommended for database, cache, and vector infrastructure)
+* **Google Cloud Console Account**: For OAuth 2.0 Client Credentials
+
+---
+
+### Step 1: Clone & Install Node Dependencies
+
+```bash
+# 1. Clone the repository
+git clone [https://github.com/your-org/receiptlens-engine.git](https://github.com/your-org/receiptlens-engine.git)
+cd receiptlens-engine
+
+# 2. Install Node.js backend dependencies
+npm install
+```
+
+---
+
+
+### Step 2: Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+---
+
+### Step 3: Start PostgreSQL with `pgvector` & Redis
+
+```bash
+docker compose up postgres redis extractor -d
+```
+---
+
+### Step 4: Run Migrations & Seed
+
+```bash
+# Run Migrations & Run Prisma Seed:
+npx prisma migrate dev --name init
+npm run prisma:seed
+
+# Start Dev Server:
+npm run dev
+```
+
+---
+
