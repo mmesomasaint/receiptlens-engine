@@ -11,7 +11,9 @@ afterAll(async () => {
   try {
     await ingestionQueue.close();
   } catch (_) {}
+
   try {
-    await redisClient.quit();
+    redisClient.on('error', () => {}); // Mute connection-closed errors on shutdown
+    await redisClient.disconnect();
   } catch (_) {}
 });
