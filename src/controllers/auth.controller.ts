@@ -9,6 +9,13 @@ import { AppError } from '../errors/app-error';
 
 const prisma = new PrismaClient();
 
+interface GoogleUserProfile {
+  id: string;
+  email: string;
+  name?: string;
+  picture?: string;
+}
+
 export class AuthController {
   /**
    * Generates Google OAuth 2.0 redirection URL.
@@ -42,12 +49,14 @@ export class AuthController {
       }
 
       // Fetch Google Profile Info
-      const oauth2 = googleService.getOAuthClient();
-      oauth2.setCredentials(tokens);
       const resProfile = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
         headers: { Authorization: `Bearer ${tokens.access_token}` },
       });
-      const profile = await resProfile.json();
+      const profile = (await resProfile.json()) as GoogleUserProfile;
+
+      if (!profile.id || !profile.email) {
+        throw new AppError('Failed to retrieve user profile details from Google.', 400);
+      }
 
       const encryptedRefreshToken = encryptionService.encrypt(tokens.refresh_token);
 
