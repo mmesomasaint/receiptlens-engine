@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { config } from '../config';
 
 export class EncryptionService {
-  private algorithm = 'aes-256-gcm';
+  private readonly algorithm = 'aes-256-gcm' as const;
   private key: Buffer;
 
   constructor() {
@@ -15,7 +15,7 @@ export class EncryptionService {
 
   public encrypt(plainText: string): string {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
+    const cipher = crypto.createCipheriv(this.algorithm, this.key, iv) as crypto.CipherGCM;
     let encrypted = cipher.update(plainText, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     const authTag = cipher.getAuthTag().toString('hex');
@@ -30,7 +30,7 @@ export class EncryptionService {
     }
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
+    const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv) as crypto.DecipherGCM;
     decipher.setAuthTag(authTag);
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
