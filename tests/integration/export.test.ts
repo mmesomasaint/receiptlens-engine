@@ -1,19 +1,26 @@
-// tests/integration/auth.test.ts
+// tests/integration/export.test.ts
 import request from 'supertest';
 import app from '../../src/app';
+import jwt from 'jsonwebtoken';
+import { config } from '../../src/config';
 
-describe('OAuth Endpoint Routing', () => {
-  it('GET /api/v1/auth/google returns an authorization URL containing requested scopes', async () => {
-    const res = await request(app).get('/api/v1/auth/google');
-    expect(res.status).toBe(200);
-    expect(res.body.status).toBe('success');
-    expect(res.body.data.authorizationUrl).toContain('accounts.google.com');
-    expect(res.body.data.authorizationUrl).toContain('gmail.readonly');
+describe('Tax Year Export Endpoint', () => {
+  let freeToken: string;
+
+  beforeAll(() => {
+    freeToken = jwt.sign(
+      { userId: 'free-user-id', email: 'free@receiptlens.local', tier: 'FREE_90_DAYS' },
+      config.jwtSecret,
+      { expiresIn: '1h' }
+    );
   });
 
-  it('GET /api/v1/auth/google/callback fails with 400 when no code is supplied', async () => {
-    const res = await request(app).get('/api/v1/auth/google/callback');
-    expect(res.status).toBe(400);
-    expect(res.body.message).toContain('Missing OAuth authorization code');
+  it('blocks 1-click ZIP export for free-tier users with 403 Forbidden', async () => {
+    const res = await request(app)
+      .get('/api/v1/export/tax-year/2025')
+      .set('Authorization', `Bearer ${freeToken}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toContain('requires an active Pro subscription');
   });
 });
